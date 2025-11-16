@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <?!= HtmlService.createHtmlOutputFromFile('Stylesheet').getContent(); ?>
+  </head>
+  <body>
+    <div class="container">
+      <div class="section">
+        <h2>🚀 GEMS</h2>
+        <div class="form-group">
+            <label for="gem-select-edit">Selecionar GEMS para Editar/Excluir</label>
+            <select id="gem-select-edit" onchange="loadGemForEdit()"></select>
+        </div>
+        <div class="form-group">
+          <label for="gem-name">Nome do GEMS</label>
+          <input type="text" id="gem-name" placeholder="Ex: Foco em QA">
+        </div>
+        <div class="form-group">
+          <label for="gem-desc">Descrição</label>
+          <textarea id="gem-desc" rows="3" placeholder="Ex: Especialista em automação de testes..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="gem-tags">Tags (separadas por vírgula)</label>
+          <input type="text" id="gem-tags" placeholder="Ex: Java, Selenium, API Rest">
+        </div>
+        <button onclick="addGem()">Adicionar GEMS</button>
+        <button class="button-secondary" onclick="updateGem()">Atualizar GEMS</button>
+        <button class="button-secondary" onclick="deleteGem()">Excluir GEMS</button>
+      </div>
+
+      <div class="section">
+        <h2>📝 Copiar Mensagem</h2>
+        <div class="form-group">
+          <label for="email-row-select">Selecione o Email para Copiar</label>
+          <select id="email-row-select" onchange="loadMessageToCopy()"></select>
+        </div>
+        <div class="form-group">
+          <textarea id="copy-message-area" rows="10" readonly></textarea>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>💼 Vagas</h2>
+        <div class="form-group">
+          <label for="vaga-select-edit">Selecionar Vaga para Editar/Excluir</label>
+          <select id="vaga-select-edit" onchange="loadVagaForEdit()"></select>
+        </div>
+        <div class="form-group">
+          <label for="vaga-title">Título da Vaga</label>
+          <input type="text" id="vaga-title" placeholder="Ex: Analista QA Pleno">
+        </div>
+        <div class="form-group">
+          <label for="vaga-company">Empresa</label>
+          <input type="text" id="vaga-company" placeholder="Ex: MJV">
+        </div>
+        <div class="form-group">
+          <label for="vaga-senioridade">Senioridade</label>
+          <input type="text" id="vaga-senioridade" placeholder="Ex: Pleno">
+        </div>
+        <div class="form-group">
+          <label for="vaga-link">Link da Vaga</label>
+          <input type="text" id="vaga-link" placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label for="vaga-tags">Tags Técnicas (separadas por vírgula)</label>
+          <input type="text" id="vaga-tags" placeholder="Ex: Java, Python, Selenium">
+        </div>
+        <div class="form-group">
+          <label for="vaga-contato">Contato</label>
+          <input type="text" id="vaga-contato" placeholder="Ex: Nome do Recrutador">
+        </div>
+        <div class="form-group">
+          <label for="vaga-email">Email do Contato</label>
+          <input type="email" id="vaga-email" placeholder="Ex: recrutador@empresa.com">
+        </div>
+        <button onclick="addVaga()">Adicionar Vaga</button>
+        <button class="button-secondary" onclick="updateVaga()">Atualizar Vaga</button>
+        <button class="button-secondary" onclick="deleteVaga()">Excluir Vaga</button>
+      </div>
+
+      <div class="section">
+        <h2>📧 Emails</h2>
+        <div class="form-group">
+          <label for="gem-select">Selecione o GEMS para usar no Email</label>
+          <select id="gem-select"></select>
+        </div>
+        <button onclick="generateEmails()">Gerar Emails</button>
+        <button class="button-secondary" onclick="exportCsv()">Exportar CSV</button>
+      </div>
+
+      <div class="section">
+        <h2>👥 Candidaturas</h2>
+        <div class="form-group">
+          <label for="candidatura-vaga-select">Selecione a Vaga</label>
+          <select id="candidatura-vaga-select"></select>
+        </div>
+        <div class="form-group">
+          <label for="candidatura-gem-select">Selecione o GEMS</label>
+          <select id="candidatura-gem-select"></select>
+        </div>
+        <div class="form-group">
+          <label for="candidatura-select-edit">Selecionar Candidatura para Editar/Excluir</label>
+          <select id="candidatura-select-edit" onchange="loadCandidaturaForEdit()"></select>
+        </div>
+        <div class="form-group">
+          <label for="candidatura-status">Status</label>
+          <input type="text" id="candidatura-status" placeholder="Ex: Aplicado">
+        </div>
+        <button onclick="addCandidatura()">Adicionar Candidatura</button>
+        <button class="button-secondary" onclick="updateCandidatura()">Atualizar Candidatura</button>
+        <button class="button-secondary" onclick="deleteCandidatura()">Excluir Candidatura</button>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', (event) => {
+        google.script.run.withSuccessHandler(populateGems).getGems();
+        google.script.run.withSuccessHandler(populateVagas).getVagas();
+        google.script.run.withSuccessHandler(populateCandidaturaVagas).getVagas();
+        google.script.run.withSuccessHandler(populateCandidaturaGems).getGems();
+        google.script.run.withSuccessHandler(populateCandidaturasForEdit).getCandidaturas();
+        google.script.run.withSuccessHandler(populateEmailsForCopy).getEmailsForCopy();
+      });
+
+      function populateEmailsForCopy(emails) {
+        const select = document.getElementById('email-row-select');
+        select.innerHTML = '<option value="">Selecione um Email</option>';
+        emails.forEach(email => {
+          let option = new Option(`${email.empresa} - ${email.contato}`, email.row);
+          select.add(option);
+        });
+      }
+
+      function loadMessageToCopy() {
+        const selectedRow = document.getElementById('email-row-select').value;
+        if (selectedRow) {
+          google.script.run.withSuccessHandler((message) => {
+            document.getElementById('copy-message-area').value = message;
+          }).getMessageText(selectedRow);
+        }
+      }
+
+      function populateCandidaturaVagas(vagas) {
+        const select = document.getElementById('candidatura-vaga-select');
+        select.innerHTML = '';
+        vagas.forEach(vaga => {
+          let option = new Option(vaga.title, vaga.id);
+          select.add(option);
+        });
+      }
+
+      function populateCandidaturaGems(gems) {
+        const select = document.getElementById('candidatura-gem-select');
+        select.innerHTML = '';
+        gems.forEach(gem => {
+          let option = new Option(gem.name, gem.id);
+          select.add(option);
+        });
+      }
+
+      function populateCandidaturasForEdit(candidaturas) {
+        const select = document.getElementById('candidatura-select-edit');
+        select.innerHTML = '<option value="">Selecione uma Candidatura</option>';
+        candidaturas.forEach(c => {
+          let option = new Option(`${c.vagaName} - ${c.gemName}`, c.id);
+          select.add(option);
+        });
+      }
+
+      function loadCandidaturaForEdit() {
+        const selectedId = document.getElementById('candidatura-select-edit').value;
+        if (selectedId) {
+          google.script.run.withSuccessHandler((c) => {
+            document.getElementById('candidatura-vaga-select').value = c.vagaId;
+            document.getElementById('candidatura-gem-select').value = c.gemId;
+            document.getElementById('candidatura-status').value = c.status;
+          }).getCandidaturaById(selectedId);
+        }
+      }
+
+      function updateCandidatura() {
+        const selectedId = document.getElementById('candidatura-select-edit').value;
+        if (!selectedId) {
+          alert('Selecione uma candidatura para atualizar.');
+          return;
+        }
+        const candidatura = {
+          id: selectedId,
+          vagaId: document.getElementById('candidatura-vaga-select').value,
+          gemId: document.getElementById('candidatura-gem-select').value,
+          status: document.getElementById('candidatura-status').value,
+        };
+        google.script.run.withSuccessHandler(() => {
+          alert('Candidatura atualizada com sucesso!');
+          google.script.run.withSuccessHandler(populateCandidaturasForEdit).getCandidaturas();
+        }).updateCandidatura(candidatura);
+      }
+
+      function deleteCandidatura() {
+        const selectedId = document.getElementById('candidatura-select-edit').value;
+        if (!selectedId) {
+          alert('Selecione uma candidatura para excluir.');
+          return;
+        }
+        google.script.run.withSuccessHandler(() => {
+          alert('Candidatura excluída com sucesso!');
+          google.script.run.withSuccessHandler(populateCandidaturasForEdit).getCandidaturas();
+        }).deleteCandidatura(selectedId);
+      }
+
+      function populateCandidaturaDropdowns(items, id) {
+          const select = document.getElementById(id);
+          select.innerHTML = '';
+          items.forEach(item => {
+              let option = new Option(item.name || item.title, item.id);
+              select.add(option);
+          });
+      }
+
+      function addCandidatura() {
+          const candidatura = {
+              vagaId: document.getElementById('candidatura-vaga-select').value,
+              gemId: document.getElementById('candidatura-gem-select').value,
+              status: document.getElementById('candidatura-status').value
+          };
+          google.script.run.withSuccessHandler(() => {
+              alert('Candidatura adicionada com sucesso!');
+              document.getElementById('candidatura-status').value = '';
+          }).addCandidatura(candidatura);
+      }
+
+      function populateVagas(vagas) {
+        const selectEdit = document.getElementById('vaga-select-edit');
+        selectEdit.innerHTML = '<option value="">Selecione uma Vaga</option>';
+        vagas.forEach(vaga => {
+          let option = new Option(vaga.title, vaga.id);
+          selectEdit.add(option);
+        });
+      }
+
+      function loadVagaForEdit() {
+        const selectedId = document.getElementById('vaga-select-edit').value;
+        if (selectedId) {
+          google.script.run.withSuccessHandler((vaga) => {
+            document.getElementById('vaga-title').value = vaga.title;
+            document.getElementById('vaga-company').value = vaga.company;
+            document.getElementById('vaga-senioridade').value = vaga.senioridade;
+            document.getElementById('vaga-link').value = vaga.link;
+            document.getElementById('vaga-tags').value = vaga.tags;
+            document.getElementById('vaga-contato').value = vaga.contato;
+            document.getElementById('vaga-email').value = vaga.email;
+          }).getVagaById(selectedId);
+        }
+      }
+
+      function updateVaga() {
+        const selectedId = document.getElementById('vaga-select-edit').value;
+        if (!selectedId) {
+          alert('Selecione uma Vaga para atualizar.');
+          return;
+        }
+        const vaga = {
+          id: selectedId,
+          title: document.getElementById('vaga-title').value,
+          company: document.getElementById('vaga-company').value,
+          senioridade: document.getElementById('vaga-senioridade').value,
+          link: document.getElementById('vaga-link').value,
+          tags: document.getElementById('vaga-tags').value,
+          contato: document.getElementById('vaga-contato').value,
+          email: document.getElementById('vaga-email').value,
+        };
+        google.script.run.withSuccessHandler(() => {
+          alert('Vaga atualizada com sucesso!');
+          google.script.run.withSuccessHandler(populateVagas).getVagas();
+        }).updateVaga(vaga);
+      }
+
+      function deleteVaga() {
+        const selectedId = document.getElementById('vaga-select-edit').value;
+        if (!selectedId) {
+          alert('Selecione uma Vaga para excluir.');
+          return;
+        }
+        google.script.run.withSuccessHandler(() => {
+          alert('Vaga excluída com sucesso!');
+          google.script.run.withSuccessHandler(populateVagas).getVagas();
+        }).deleteVaga(selectedId);
+      }
+
+      function populateGems(gems) {
+        const select = document.getElementById('gem-select');
+        const selectEdit = document.getElementById('gem-select-edit');
+
+        // Clear existing options
+        select.innerHTML = '';
+        selectEdit.innerHTML = '<option value="">Selecione um GEMS</option>';
+
+        gems.forEach(gem => {
+          let option = new Option(gem.name, gem.id);
+          let optionEdit = new Option(gem.name, gem.id);
+          select.add(option);
+          selectEdit.add(optionEdit);
+        });
+      }
+
+      function loadGemForEdit() {
+        const selectedId = document.getElementById('gem-select-edit').value;
+        if (selectedId) {
+          google.script.run.withSuccessHandler((gem) => {
+            document.getElementById('gem-name').value = gem.name;
+            document.getElementById('gem-desc').value = gem.desc;
+            document.getElementById('gem-tags').value = gem.tags;
+          }).getGemById(selectedId);
+        }
+      }
+
+      function updateGem() {
+        const selectedId = document.getElementById('gem-select-edit').value;
+        if (!selectedId) {
+          alert('Selecione um GEMS para atualizar.');
+          return;
+        }
+        const gem = {
+          id: selectedId,
+          name: document.getElementById('gem-name').value,
+          desc: document.getElementById('gem-desc').value,
+          tags: document.getElementById('gem-tags').value,
+        };
+        google.script.run.withSuccessHandler(() => {
+          alert('GEMS atualizado com sucesso!');
+          google.script.run.withSuccessHandler(populateGems).getGems();
+        }).updateGem(gem);
+      }
+
+      function deleteGem() {
+        const selectedId = document.getElementById('gem-select-edit').value;
+        if (!selectedId) {
+          alert('Selecione um GEMS para excluir.');
+          return;
+        }
+        google.script.run.withSuccessHandler(() => {
+          alert('GEMS excluído com sucesso!');
+          document.getElementById('gem-name').value = '';
+          document.getElementById('gem-desc').value = '';
+          document.getElementById('gem-tags').value = '';
+          google.script.run.withSuccessHandler(populateGems).getGems();
+        }).deleteGem(selectedId);
+      }
+
+      function addGem() {
+        const name = document.getElementById('gem-name').value;
+        const desc = document.getElementById('gem-desc').value;
+        const tags = document.getElementById('gem-tags').value;
+        google.script.run.withSuccessHandler(() => {
+          alert('GEMS adicionado com sucesso!');
+          document.getElementById('gem-name').value = '';
+          document.getElementById('gem-desc').value = '';
+          document.getElementById('gem-tags').value = '';
+          google.script.run.withSuccessHandler(populateGems).getGems();
+        }).withFailureHandler((err) => {
+          alert('Erro ao adicionar GEMS: ' + err.message);
+        }).addGem(name, desc, tags);
+      }
+
+      function addVaga() {
+        const vaga = {
+          title: document.getElementById('vaga-title').value,
+          company: document.getElementById('vaga-company').value,
+          senioridade: document.getElementById('vaga-senioridade').value,
+          link: document.getElementById('vaga-link').value,
+          tags: document.getElementById('vaga-tags').value,
+          contato: document.getElementById('vaga-contato').value,
+          email: document.getElementById('vaga-email').value,
+        };
+        google.script.run.withSuccessHandler(() => {
+          alert('Vaga adicionada com sucesso!');
+          Object.keys(vaga).forEach(key => document.getElementById(`vaga-${key}`).value = '');
+        }).withFailureHandler((err) => {
+          alert('Erro ao adicionar vaga: ' + err.message);
+        }).addVaga(vaga);
+      }
+
+      function generateEmails() {
+        const selectedGemId = document.getElementById('gem-select').value;
+        google.script.run.withSuccessHandler(() => {
+          alert('Emails gerados com sucesso!');
+        }).withFailureHandler((err) => {
+          alert('Erro ao gerar emails: ' + err.message);
+        }).generateEmailsForVagas(selectedGemId);
+      }
+
+      function exportCsv() {
+        google.script.run.withSuccessHandler((csvContent) => {
+          const blob = new Blob([csvContent], { type: 'text/csv' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'emails.csv';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }).withFailureHandler((err) => {
+          alert('Erro ao exportar CSV: ' + err.message);
+        }).exportEmailsToCsv();
+      }
+    </script>
+  </body>
+</html>
