@@ -1,0 +1,35 @@
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.data-table th,
+.data-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.data-table thead th {
+  background-color: var(--sidebar-bg);
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.data-table tbody tr {
+  transition: background-color 0.2s;
+}
+
+.data-table tbody tr:hover {
+  background-color: var(--hover-color);
+}
+
+.data-table a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.data-table a:hover {
+  text-decoration: underline;
+}
