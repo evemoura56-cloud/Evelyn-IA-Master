@@ -1,0 +1,132 @@
+/* Estilo geral do contêiner da página de chat */
+.chat-page-container {
+  display: flex;
+  height: 100%; /* Ocupa a altura total do contêiner pai */
+  gap: 20px;
+  padding: 20px;
+  background-color: var(--color-background-secondary); /* Cor de fundo suave */
+}
+
+/* Barra lateral para seleção de persona */
+.persona-selector {
+  flex: 0 0 280px; /* Base de 280px, não cresce, não encolhe */
+  padding: 20px;
+  border-radius: 8px;
+  background-color: var(--color-background-tertiary);
+  border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.persona-selector-title {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--color-text-primary);
+}
+
+.persona-select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  font-size: 1rem;
+}
+
+.persona-description {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+/* Janela principal do chat */
+.chat-window {
+  flex: 1; /* Ocupa o espaço restante */
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  background-color: var(--color-background-tertiary);
+  border: 1px solid var(--color-border);
+  overflow: hidden; /* Garante que os filhos não ultrapassem a borda arredondada */
+}
+
+/* Lista de mensagens */
+.message-list {
+  flex: 1; /* Ocupa todo o espaço vertical disponível */
+  padding: 20px;
+  overflow-y: auto; /* Adiciona scroll se as mensagens ultrapassarem a altura */
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Estilo individual de cada mensagem */
+.message {
+  padding: 10px 15px;
+  border-radius: 18px;
+  max-width: 70%;
+  line-height: 1.6;
+}
+
+.message p {
+  margin: 0;
+}
+
+/* Mensagem do usuário (alinhada à direita) */
+.message.user {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px; /* Estilo de "bolha" */
+}
+
+/* Mensagem do assistente (alinhada à esquerda) */
+.message.assistant {
+  background-color: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  align-self: flex-start;
+  border: 1px solid var(--color-border);
+  border-bottom-left-radius: 4px; /* Estilo de "bolha" */
+}
+
+
+/* Formulário para enviar nova mensagem */
+.message-form {
+  display: flex;
+  padding: 15px;
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-background-tertiary);
+}
+
+.message-input {
+  flex: 1; /* Ocupa o espaço disponível */
+  padding: 12px 15px;
+  border-radius: 20px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  margin-right: 10px;
+}
+
+.message-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.send-button {
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: none;
+  background-color: var(--color-primary);
+  color: #ffffff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.send-button:hover {
+  background-color: var(--color-primary-hover);
+}
