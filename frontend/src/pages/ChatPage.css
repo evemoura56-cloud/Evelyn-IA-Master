@@ -82,6 +82,28 @@
   line-height: 1.65;
 }
 
+.persona-details {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.persona-details h3 {
+  margin: 0 0 8px;
+}
+
+.persona-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.persona-details small {
+  color: var(--color-text-secondary);
+}
+
 /* Janela principal do chat */
 .chat-window {
   flex: 1;

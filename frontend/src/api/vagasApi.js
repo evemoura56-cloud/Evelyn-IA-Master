@@ -1,21 +1,6 @@
-import apiClient from './apiClient';
+import { localDatabase } from '../services/localDatabase';
 
 export const vagasApi = {
-  getVagas: () => {
-    return apiClient.get('?path=vagas');
-  },
-  createVaga: (vagaData) => {
-    // O backend espera chaves em maiúsculo (TITULO_VAGA, etc.)
-    const formattedData = {
-      TITULO_VAGA: vagaData.titulo,
-      EMPRESA: vagaData.empresa,
-      LOCAL: vagaData.local,
-      MODELO: vagaData.modelo,
-      TIPO_CONTRATO: vagaData.tipoContrato,
-      SENIORIDADE: vagaData.senioridade,
-      LINK_VAGA: vagaData.link,
-      FONTE: vagaData.fonte,
-    };
-    return apiClient.post('?path=vagas', formattedData);
-  },
+  getVagas: () => Promise.resolve({ data: localDatabase.getVagas() }),
+  createVaga: (vagaData) => Promise.resolve({ data: localDatabase.createVaga(vagaData) })
 };

@@ -1,16 +1,27 @@
-# React + Vite
+# Evelyn Mater – Frontend local
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+SPA construída com React + Vite para centralizar personas, chat e gestão de vagas sem qualquer dependência externa.
 
-Currently, two official plugins are available:
+## Scripts disponíveis
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```bash
+npm install        # instala dependências
+npm run dev        # inicia em modo desenvolvimento (http://localhost:5173)
+npm run build      # gera a pasta dist para deploy estático
+npm run preview    # simula produção
+```
 
-## React Compiler
+## Estrutura
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- `src/data/defaultState.js` – dados iniciais.
+- `src/services/localDatabase.js` – CRUD em cima do `localStorage`.
+- `src/api/*.js` – camada fina que conversa com o banco local (mantém a mesma interface de uma API HTTP).
+- `src/pages` – telas (Dashboard, Personas, Chat, Vagas, Links, Candidaturas e Preenchedor).
 
-## Expanding the ESLint configuration
+## Customizações rápidas
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Resetar dados**: `localStorage.removeItem('evelyn-ia-master:db')` no console do navegador.
+- **Editar respostas do chat**: função `simulateChatResponse` em `localDatabase.js`.
+- **Modificar cálculo de compatibilidade**: função `calculateCompatibility` no mesmo arquivo.
+
+Sinta-se à vontade para adaptar o layout e incluir novas métricas – tudo já está pronto para funcionar offline.
