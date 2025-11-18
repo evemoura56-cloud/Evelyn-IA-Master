@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { getGems, postChatMessage } from '../api/api';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useParams } from 'react-router-dom';
+import { gemsApi } from '../api/gemsApi';
+import { chatApi } from '../api/chatApi';
 import './ChatPage.css';
 
 const ChatPage = () => {
@@ -13,22 +15,34 @@ const ChatPage = () => {
 
   const messageListRef = useRef(null);
 
+  const { personaSlug } = useParams();
+
   // Efeito para buscar as personas quando o componente é montado
   useEffect(() => {
     const fetchPersonas = async () => {
       try {
-        const activeGems = await getGems();
-        const parsedPersonas = Array.isArray(activeGems)
-          ? activeGems
-          : activeGems?.data || [];
-        setPersonas(parsedPersonas); // Garante que temos um array
+        const response = await gemsApi.getGems();
+        const data = response?.data;
+        const parsedPersonas = Array.isArray(data) ? data : data?.data || [];
+        setPersonas(parsedPersonas);
+        setSelectedPersona((current) => {
+          if (personaSlug) {
+            const personaExists = parsedPersonas.some((persona) => persona.slug === personaSlug);
+            if (personaExists) {
+              return personaSlug;
+            }
+          }
+          if (current) {
+            return current;
+          }
+          return parsedPersonas[0]?.slug || '';
+        });
       } catch (error) {
-        console.error("Falha ao carregar personas.", error);
-        // Adicionar uma mensagem de erro na UI seria uma boa melhoria
+        console.error('Falha ao carregar personas.', error);
       }
     };
     fetchPersonas();
-  }, []);
+  }, [personaSlug]);
 
   // Efeito para rolar para a última mensagem
   useEffect(() => {
@@ -48,15 +62,12 @@ const ChatPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await postChatMessage({
-        personaSlug: selectedPersona,
-        userMessage: userInput,
-        conversationId: conversationId,
-      });
+      const response = await chatApi.sendMessage(selectedPersona, userInput, conversationId);
+      const responseData = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
 
-      const assistantMessage = { sender: 'assistant', text: response.assistantMessage };
+      const assistantMessage = { sender: 'assistant', text: responseData.assistantMessage };
       setMessages(prevMessages => [...prevMessages, assistantMessage]);
-      setConversationId(response.conversationId);
+      setConversationId(responseData.conversationId);
 
     } catch (error) {
       const errorMessage = { sender: 'assistant', text: 'Desculpe, ocorreu um erro ao processar sua mensagem.' };
@@ -73,10 +84,12 @@ const ChatPage = () => {
     setConversationId(null);
   };
 
+  const personaSelecionada = useMemo(() => personas.find((persona) => persona.slug === selectedPersona), [personas, selectedPersona]);
+
   return (
     <div className="chat-page-container">
       <aside className="persona-selector">
-        <h2 className="persona-selector-title">Personas (GEMS)</h2>
+        <h2 className="persona-selector-title">Personas locais</h2>
         <select className="persona-select" value={selectedPersona} onChange={handlePersonaChange}>
           <option value="">Selecione uma persona</option>
           {personas.map(persona => (
@@ -85,16 +98,29 @@ const ChatPage = () => {
             </option>
           ))}
         </select>
-        <p className="persona-description">
-          Selecione uma das suas GEMS para iniciar uma conversa. A resposta da IA será baseada no "SYSTEM_PROMPT" que você configurou na planilha.
-        </p>
+        {personaSelecionada ? (
+          <div className="persona-details">
+            <h3>{personaSelecionada.nome}</h3>
+            <p>{personaSelecionada.descricao}</p>
+            <div className="persona-tags">
+              <span className="pill">{personaSelecionada.personalidade}</span>
+              <span className="pill">Tom: {personaSelecionada.tom}</span>
+              <span className="pill">Foco: {personaSelecionada.focoCarreira}</span>
+            </div>
+            <small>Instruções: {personaSelecionada.instrucoes}</small>
+          </div>
+        ) : (
+          <p className="persona-description">
+            Selecione uma das suas personas criadas na Evelyn Mater. Tudo acontece localmente, sem API externa.
+          </p>
+        )}
       </aside>
 
       <main className="chat-window">
         <div className="message-list" ref={messageListRef}>
           {messages.length === 0 && (
             <div className="message assistant">
-                <p>Olá! Por favor, selecione uma persona para começar a conversar.</p>
+                <p>{personaSelecionada ? `Olá! Você está falando com ${personaSelecionada.nome}. Envie sua primeira mensagem!` : 'Olá! Por favor, selecione uma persona para começar a conversar.'}</p>
             </div>
           )}
           {messages.map((msg, index) => (

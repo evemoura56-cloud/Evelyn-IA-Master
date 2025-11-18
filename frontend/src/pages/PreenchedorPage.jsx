@@ -17,10 +17,8 @@ const PreenchedorPage = () => {
   useEffect(() => {
     gemsApi.getGems().then(response => {
       setPersonas(response.data);
-      // Seleciona a primeira persona de carreira por padrão
-      const defaultPersona = response.data.find(p => p.scope === 'carreira');
-      if (defaultPersona) {
-        setFormState(prev => ({ ...prev, personaSlug: defaultPersona.slug }));
+      if (response.data.length) {
+        setFormState(prev => ({ ...prev, personaSlug: response.data[0].slug }));
       }
     });
   }, []);
@@ -49,7 +47,7 @@ const PreenchedorPage = () => {
       <h1>Robô Preenchedor de Vagas</h1>
       <form onSubmit={handleSubmit} className="form-container">
         <select name="personaSlug" value={formState.personaSlug} onChange={handleInputChange}>
-          {personas.map(p => <option key={p.slug} value={p.slug}>{p.name}</option>)}
+          {personas.map(p => <option key={p.slug} value={p.slug}>{p.nome}</option>)}
         </select>
         <textarea name="dadosVaga" value={formState.dadosVaga} onChange={handleInputChange} placeholder="Cole a descrição da vaga aqui..." rows="10" required />
         <textarea name="perfilCandidata" value={formState.perfilCandidata} onChange={handleInputChange} placeholder="Cole um resumo do seu perfil ou currículo..." rows="5" required />
