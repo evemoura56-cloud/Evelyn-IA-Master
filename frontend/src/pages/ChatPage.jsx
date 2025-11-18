@@ -18,7 +18,10 @@ const ChatPage = () => {
     const fetchPersonas = async () => {
       try {
         const activeGems = await getGems();
-        setPersonas(activeGems.data || []); // Garante que temos um array
+        const parsedPersonas = Array.isArray(activeGems)
+          ? activeGems
+          : activeGems?.data || [];
+        setPersonas(parsedPersonas); // Garante que temos um array
       } catch (error) {
         console.error("Falha ao carregar personas.", error);
         // Adicionar uma mensagem de erro na UI seria uma boa melhoria
@@ -78,7 +81,7 @@ const ChatPage = () => {
           <option value="">Selecione uma persona</option>
           {personas.map(persona => (
             <option key={persona.slug} value={persona.slug}>
-              {persona.nome}
+              {persona.nome || persona.name || persona.slug}
             </option>
           ))}
         </select>

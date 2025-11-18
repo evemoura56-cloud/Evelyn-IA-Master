@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
+import './index.css';
 import './styles/layout.css'; // Importação global de estilos
 
 import Layout from './components/Layout';

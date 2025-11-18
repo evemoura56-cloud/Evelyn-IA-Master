@@ -7,18 +7,36 @@
 const GemService = {
 
   /**
+   * Determina se uma GEM está ativa.
+   * A coluna ATIVA nem sempre está presente ou pode conter diferentes representações.
+   */
+  isGemActive(gem) {
+    if (gem.ATIVA === undefined || gem.ATIVA === "") {
+      return true; // Se a coluna não existir ou estiver vazia, consideramos ativa
+    }
+
+    if (typeof gem.ATIVA === "boolean") {
+      return gem.ATIVA;
+    }
+
+    const normalized = String(gem.ATIVA).toLowerCase();
+    return normalized === "true" || normalized === "1" || normalized === "sim";
+  },
+
+  /**
    * Retorna uma lista de todas as GEMS que estão marcadas como ativas na planilha.
    */
   getActiveGems() {
     const allGems = SheetService.getSheetData("GEMS");
-    const activeGems = allGems.filter(gem => gem.ATIVA === true);
+    const activeGems = allGems.filter(gem => this.isGemActive(gem));
 
     // Retorna apenas os campos relevantes para o frontend
     return activeGems.map(gem => ({
       id: gem.ID,
-      name: gem.NOME,
+      nome: gem.NOME,
       slug: gem.SLUG,
-      description: gem.DESCRICAO,
+      descricao: gem.DESCRICAO,
+      systemPrompt: gem.SYSTEM_PROMPT,
       tone: gem.TONE,
       tags: gem.TAGS,
       scope: gem.SCOPE
@@ -32,7 +50,7 @@ const GemService = {
    */
   getGemBySlug(slug) {
     const allGems = SheetService.getSheetData("GEMS");
-    const gem = allGems.find(g => g.SLUG === slug && g.ATIVA === true);
+    const gem = allGems.find(g => g.SLUG === slug && this.isGemActive(g));
 
     if (!gem) {
       Logger.log(`Persona com slug "${slug}" não encontrada ou inativa.`);
