@@ -26,6 +26,11 @@ const VagasPage = () => {
   const [selectedPersona, setSelectedPersona] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [feedSearch, setFeedSearch] = useState('produto digital');
+  const [feedLoading, setFeedLoading] = useState(false);
+  const [feedError, setFeedError] = useState('');
+  const [realVagas, setRealVagas] = useState([]);
+  const [importingId, setImportingId] = useState(null);
   const [formState, setFormState] = useState(initialForm);
 
   const loadVagas = async () => {
@@ -47,6 +52,49 @@ const VagasPage = () => {
     loadVagas();
     loadPersonas();
   }, []);
+
+  const buscarVagasReais = async () => {
+    setFeedLoading(true);
+    setFeedError('');
+    try {
+      const data = await vagasApi.fetchRealVagas(feedSearch);
+      setRealVagas(data);
+    } catch (error) {
+      setFeedError(error.message || 'Erro ao buscar vagas reais.');
+      setRealVagas([]);
+    } finally {
+      setFeedLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    buscarVagasReais();
+  }, []);
+
+  const handleImportVaga = async (vaga) => {
+    setImportingId(vaga.id);
+    try {
+      await vagasApi.createVaga({
+        titulo: vaga.titulo,
+        empresa: vaga.empresa,
+        link: vaga.link,
+        senioridade: vaga.senioridade,
+        modelo: vaga.modelo,
+        tipoContrato: vaga.tipoContrato,
+        focoCarreira: vaga.focoCarreira,
+        stackDesejada: vaga.stackDesejada.join(', '),
+        valoresCultura: '',
+        origem: vaga.origem,
+        descricao: vaga.descricao,
+        status: 'Recebendo candidaturas'
+      });
+      await loadVagas();
+    } catch (error) {
+      alert(error.message || 'Não foi possível importar esta vaga.');
+    } finally {
+      setImportingId(null);
+    }
+  };
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -186,6 +234,56 @@ const VagasPage = () => {
           </tbody>
         </table>
       )}
+
+      <section className="module-card">
+        <header className="module-card__header">
+          <div>
+            <h2>Buscar vagas reais (24-72h)</h2>
+            <p>Integração com o feed público da Remotive. Apenas links publicados nas últimas 72h são exibidos.</p>
+          </div>
+          <div className="module-card__controls">
+            <input
+              type="text"
+              value={feedSearch}
+              onChange={(event) => setFeedSearch(event.target.value)}
+              placeholder="Palavra-chave (ex.: design, frontend)"
+            />
+            <button type="button" onClick={buscarVagasReais} disabled={feedLoading}>
+              {feedLoading ? 'Buscando...' : 'Buscar vagas' }
+            </button>
+          </div>
+        </header>
+        {feedError && <p className="error-message">{feedError}</p>}
+        {feedLoading ? (
+          <p>Buscando vagas publicadas nas últimas horas...</p>
+        ) : realVagas.length === 0 ? (
+          <p>Nenhuma vaga encontrada nesse intervalo de 24-72 horas.</p>
+        ) : (
+          <div className="job-feed-grid">
+            {realVagas.map((vaga) => (
+              <article key={vaga.id} className="job-feed-card">
+                <header>
+                  <h3>{vaga.titulo}</h3>
+                  <p>{vaga.empresa}</p>
+                </header>
+                <p><strong>Categoria:</strong> {vaga.focoCarreira}</p>
+                <p><strong>Tags:</strong> {vaga.stackDesejada.join(', ') || 'Sem tags'}</p>
+                <p><strong>Publicada há:</strong> {vaga.horasDesdePublicacao}h</p>
+                <div className="job-feed-card__actions">
+                  <a href={vaga.link} target="_blank" rel="noreferrer">Ver vaga real</a>
+                  <button
+                    type="button"
+                    onClick={() => handleImportVaga(vaga)}
+                    disabled={importingId === vaga.id}
+                  >
+                    {importingId === vaga.id ? 'Importando...' : 'Salvar no banco local'}
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 };

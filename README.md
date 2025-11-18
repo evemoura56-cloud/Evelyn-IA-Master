@@ -22,6 +22,13 @@ A Evelyn Mater agora roda 100% offline: todas as personas, vagas, candidaturas e
   ```
 - É possível editar os dados iniciais ou criar rotinas personalizadas diretamente no módulo `localDatabase`.
 
+## Busca de vagas reais
+
+- A aba **Vagas** possui um módulo "Buscar vagas reais (24-72h)" integrado ao feed público da [Remotive](https://remotive.com/remote-jobs).
+- Apenas vagas com publicação entre 24h e 72h atrás são listadas, garantindo links atuais.
+- Use o campo de busca para filtrar por palavra-chave (ex.: "frontend", "designer") e clique em **Salvar no banco local** para transformar a vaga importada em um registro com compatibilidade das personas.
+- A integração é somente leitura e roda direto no navegador da Evelyn Mater.
+
 ## Como rodar
 
 1. **Instale as dependências**
