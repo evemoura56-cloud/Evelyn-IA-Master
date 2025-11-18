@@ -10,6 +10,15 @@ a.routes = {};
 a.GET = (path, handler) => a.routes[path] = { method: "GET", handler };
 a.POST = (path, handler) => a.routes[path] = { method: "POST", handler };
 
+function buildResponse(payload) {
+  return ContentService
+    .createTextOutput(JSON.stringify(payload))
+    .setMimeType(ContentService.MimeType.JSON)
+    .setHeader("Access-Control-Allow-Origin", "*")
+    .setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
+    .setHeader("Access-Control-Allow-Headers", "Content-Type");
+}
+
 function doGet(e) {
   const path = e.parameter.path || "init";
   Logger.log(`Recebida requisição GET para: ${path}`);
@@ -21,14 +30,10 @@ function doGet(e) {
 
   if (a.routes[path] && a.routes[path].method === "GET") {
     const response = a.routes[path].handler(e);
-    return ContentService
-      .createTextOutput(JSON.stringify(response))
-      .setMimeType(ContentService.MimeType.JSON);
+    return buildResponse(response);
   }
 
-  return ContentService
-    .createTextOutput(JSON.stringify({ status: "error", message: "Endpoint não encontrado" }))
-    .setMimeType(ContentService.MimeType.JSON);
+  return buildResponse({ status: "error", message: "Endpoint não encontrado" });
 }
 
 function doPost(e) {
@@ -43,12 +48,13 @@ function doPost(e) {
 
   if (a.routes[path] && a.routes[path].method === "POST") {
     const response = a.routes[path].handler(e);
-    return ContentService
-      .createTextOutput(JSON.stringify(response))
-      .setMimeType(ContentService.MimeType.JSON);
+    return buildResponse(response);
   }
 
-  return ContentService
-    .createTextOutput(JSON.stringify({ status: "error", message: "Endpoint não encontrado" }))
-    .setMimeType(ContentService.MimeType.JSON);
+  return buildResponse({ status: "error", message: "Endpoint não encontrado" });
+}
+
+function doOptions(e) {
+  Logger.log("Recebida requisição OPTIONS para pré-flight CORS");
+  return buildResponse({ status: "ok" });
 }
