@@ -1,13 +1,5 @@
-import apiClient from './apiClient';
+import { localDatabase } from '../services/localDatabase';
 
 export const preenchedorApi = {
-  gerarTexto: (data) => {
-    const { personaSlug, dadosVaga, perfilCandidata, tom } = data;
-    return apiClient.post('?path=preenchedor', {
-      personaSlug,
-      dadosVaga,
-      perfilCandidata,
-      tom,
-    });
-  },
+  gerarTexto: (data) => Promise.resolve({ data: localDatabase.gerarTextoPreenchedor(data) })
 };

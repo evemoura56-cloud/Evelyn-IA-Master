@@ -40,3 +40,14 @@
 .form-container button:hover {
   background-color: var(--hover-color);
 }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.form-container label {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}

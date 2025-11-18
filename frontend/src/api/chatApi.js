@@ -1,11 +1,7 @@
-import apiClient from './apiClient';
+import { localDatabase } from '../services/localDatabase';
 
 export const chatApi = {
-  sendMessage: (personaSlug, userMessage, conversationId = null) => {
-    return apiClient.post('?path=chat', {
-      personaSlug,
-      userMessage,
-      conversationId
-    });
-  },
+  sendMessage: (personaSlug, userMessage, conversationId = null) => Promise.resolve({
+    data: localDatabase.sendChatMessage(personaSlug, userMessage, conversationId)
+  })
 };
