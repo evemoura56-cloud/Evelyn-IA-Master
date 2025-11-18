@@ -1,12 +1,12 @@
 # Evelyn Mater – Hub local de personas e vagas
 
-A Evelyn Mater roda totalmente em cima de um banco local (localStorage) e, opcionalmente, consulta um feed público de vagas reais quando você desejar importar novas oportunidades. Não é necessário Google Sheets, Google Apps Script ou qualquer projeto externo.
+A Evelyn Mater agora roda 100% offline: todas as personas, vagas, candidaturas e respostas do chat vivem em um banco local (localStorage). Não é necessário Google Sheets, Google Apps Script ou qualquer API externa.
 
 ## Principais módulos
 
 1. **Personas** – cadastre até 7 personas com nome, descrição, instruções (SYSTEM PROMPT), personalidade, tom, especialidades, foco, valores e interesses.
 2. **Chat** – converse com qualquer persona. As respostas são geradas localmente de acordo com os campos configurados.
-3. **Job Hub** – registre vagas manualmente ou importe vagas reais (Remotive) filtradas por data, vendo o nível de compatibilidade de cada persona com base em senioridade, stack, valores e modelo de trabalho.
+3. **Job Hub** – registre vagas manualmente e veja o nível de compatibilidade de cada persona com base em senioridade, stack, valores e modelo de trabalho.
 4. **Links pré-preenchidos** – gere automaticamente links para candidatura contendo os parâmetros da vaga e da persona. Basta abrir, revisar e enviar manualmente.
 5. **Candidaturas** – controle o funil registrando data, status, canal e qual persona cuidou de cada candidatura.
 6. **Robô preenchedor** – gera um texto-base para abordar recrutadores utilizando o tom e as especialidades da persona escolhida.
